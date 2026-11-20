@@ -5,4 +5,7 @@ export type ProjectId = 'pomomates' | 'travel' | 'expression' | 'vila' | 'mood' 
 export type DioramaProps = {
   selected: ProjectId | null
   onSelect: (id: ProjectId | null) => void
+
+  hovered: ProjectId | null
+  onHover: (id: ProjectId | null) => void
 }
