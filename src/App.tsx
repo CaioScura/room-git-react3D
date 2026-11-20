@@ -1,17 +1,13 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { Diorama, type ProjectId } from './diorama'
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  // esse estado vai morar no portfólio: é ele que liga quarto e painel
+  const [selected, setSelected] = useState<ProjectId | null>(null)
 
   return (
-    <>
-      
-    </>
+    <div style={{ height: '100vh' }}>
+      <Diorama selected={selected} onSelect={setSelected} />
+    </div>
   )
 }
-
-export default App
