@@ -11,9 +11,10 @@ type HotspotProps = Omit<ThreeElements['group'], 'id'> & {
   id: ProjectId
   label: string
   labelOffset?: [number, number, number]
+  onActivate?: () => void // ação extra do objeto ao ser clicado
 }
 
-export function Hotspot({ id, label, labelOffset = [0, 1, 0], children, ...props }: HotspotProps) {
+export function Hotspot({ id, label, labelOffset = [0, 1, 0], onActivate, children, ...props }: HotspotProps) {
   const { hovered, onHover, onSelect } = useDiorama()
   const isHovered = hovered === id
   const ref = useRef<THREE.Group>(null!)
@@ -39,6 +40,7 @@ export function Hotspot({ id, label, labelOffset = [0, 1, 0], children, ...props
   function handleClick(e: ThreeEvent<MouseEvent>) {
     e.stopPropagation()
     onSelect(id)
+    onActivate?.()
   }
 
   return (
