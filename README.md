@@ -26,6 +26,11 @@ Este README serve para **reler e entender depois** como o 3D foi construído: os
 
 ---
 
+## Projeto
+![Imagem do projeto 3D](public/img.png)
+
+---
+
 ## Como rodar
 
 ```bash
