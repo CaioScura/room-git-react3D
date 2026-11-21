@@ -1,11 +1,15 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { DioramaContext } from './context'
-import { Room } from '../scene/Room'
-import { Desk } from '../scene/Desk'
-import { Chair } from '../scene/Chair'
+import { Room } from './scene/Room'
+import { Desk } from './scene/Desk'
+import { Chair } from './scene/Chair'
 import { Tomato } from './projects/Tomato'
 import type { DioramaProps } from './types'
+import { Character } from './scene/Character'
+import { TravelMap } from './projects/TravelMap'
+import { Webcam } from './projects/Webcam'
+import { Village } from './projects/Village'
 
 export function Diorama(props: DioramaProps) {
   return (
@@ -33,9 +37,13 @@ export function Diorama(props: DioramaProps) {
         <Room />
         <Desk position={[0.4, 0, -3.95]} />
         <Chair position={[0.4, 0, -2.4]} />
+        <Character position={[0.4, 0, -2.55]} />
 
         {/* em cima da mesa (y = 1.55), à direita do mouse */}
         <Tomato position={[1.85, 1.55, -3.4]} />
+        <TravelMap />
+        <Webcam />
+        <Village />
 
         <axesHelper args={[3]} />
         <OrbitControls />
