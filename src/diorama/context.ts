@@ -9,6 +9,7 @@ export type DioramaContextValue = DioramaProps & {
 
 export const DioramaContext = createContext<DioramaContextValue | null>(null)
 
+// hook para ler o contexto; o erro avisa se alguém usar fora do Diorama
 export function useDiorama() {
   const ctx = useContext(DioramaContext)
   if (!ctx) throw new Error('useDiorama precisa ser usado dentro do <Diorama>')

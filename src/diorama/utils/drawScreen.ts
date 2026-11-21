@@ -51,7 +51,7 @@ export function drawScreen(ctx: CanvasRenderingContext2D, t: number) {
   const remaining = Math.ceil(FOCUS_MINUTES * 60 * (1 - progress))
   const mm = String(Math.floor(remaining / 60)).padStart(2, '0')
   const ss = String(remaining % 60).padStart(2, '0')
-  ctx.textAlign = 'center' // centraliza o texto no ponto (cx, ...)
+  ctx.textAlign = 'center'
   ctx.fillStyle = '#fff'
   ctx.font = 'bold 40px monospace'
   ctx.fillText(isBreak ? '05:00' : `${mm}:${ss}`, cx, cy + 14)

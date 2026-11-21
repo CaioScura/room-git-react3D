@@ -1,18 +1,22 @@
 import { useState } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
 import { DioramaContext } from './context'
+import { CameraRig } from './scene/CameraRig'
 import { Lights } from './scene/Lights'
+import { Effects } from './scene/Effects'
 import { Room } from './scene/Room'
 import { Desk } from './scene/Desk'
 import { Chair } from './scene/Chair'
 import { Character } from './scene/Character'
+import { Decor } from './decor/Decor'
 import { Tomato } from './projects/Tomato'
 import { TravelMap } from './projects/TravelMap'
 import { Webcam } from './projects/Webcam'
 import { Village } from './projects/Village'
 import { RecordPlayer } from './projects/RecordPlayer'
 import { Cat } from './projects/Cat'
+import { CoffeeMug } from './projects/CoffeeMug'
+import { Airplane } from './projects/Airplane'
 import type { DioramaProps } from './types'
 
 export function Diorama(props: DioramaProps) {
@@ -24,28 +28,34 @@ export function Diorama(props: DioramaProps) {
       shadows
       orthographic
       dpr={[1, 1.5]}
-      camera={{ position: [10, 8.5, 10], zoom: 50, near: 0.1, far: 100 }}
+      camera={{ position: [10, 8.5, 10], zoom: 20, near: 0.1, far: 100 }}
       onPointerMissed={() => props.onSelect(null)}
     >
       {/* contexto = props de fora + estado de dentro */}
       <DioramaContext.Provider value={{ ...props, mood, setMood }}>
+        <CameraRig />
         <Lights />
 
+        {/* estrutura */}
         <Room />
-        <Desk position={[0.4, 0, -3.95]} />
-        <Chair position={[0.4, 0, -2.4]} />
-        <Character position={[0.4, 0, -2.55]} />
+        <Desk position={[-0.2, 0, -2.8]} />
+        <Chair position={[-0.2, 0, -1.4]} />
+        <Character position={[-0.2, 0, -1.55]} />
 
-        {/* os 6 projetos */}
-        <Tomato position={[1.85, 1.55, -3.4]} />
+        {/* decoração (não clicável) */}
+        <Decor />
+
+        {/* os 8 projetos */}
+        <Tomato position={[1.0, 1.55, -2.55]} />
         <TravelMap />
         <Webcam />
         <Village />
         <RecordPlayer />
         <Cat />
+        <CoffeeMug />
+        <Airplane />
 
-        <axesHelper args={[3]} />
-        <OrbitControls />
+        <Effects />
       </DioramaContext.Provider>
     </Canvas>
   )

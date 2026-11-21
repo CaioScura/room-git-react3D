@@ -2,8 +2,8 @@
 export const MOODS = [
   { name: 'Calmo', color: '#6f9bff' },
   { name: 'Foco', color: '#b98cff' },
-  { name: 'Energia', color: '#ff9f5a' },
+  { name: 'Energia', color: '#ff8fc8' },
 ]
 
-// cor da luz quando nenhuma música está tocando (abajur quentinho)
-export const LAMP_COLOR = '#ffd9a8'
+// cor da luminária quando nenhuma música está tocando (lilás suave)
+export const LAMP_COLOR = '#b9b0ff'

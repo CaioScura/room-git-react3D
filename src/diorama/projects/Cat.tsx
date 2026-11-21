@@ -1,85 +1,170 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Html } from '@react-three/drei'
 import * as THREE from 'three'
-import { Box } from '../components/Box'
 import { Hotspot } from '../components/Hotspot'
-import { playTone } from '../utils/sounds'
+import { SpeechBubble } from '../components/SpeechBubble'
+import { playTone } from '../utils/sound'
 
-const FUR = '#f4a259'
-const DARK = '#c9772f'
+const FUR = '#f2a65a' // laranja
+const STRIPE = '#d47f2c' // listras mais escuras
+const WHITE = '#fff4e6' // focinho e patinhas
+const PINK = '#f4a0ae' // nariz e dentro das orelhas
+const EYE = '#7ccf6a'
 const AWAKE_MS = 3000
 
-// gato dormindo numa almofada no canto esquerdo da mesa
+const { damp } = THREE.MathUtils
+
+// gato laranja deitado em "pãozinho" no canto da mesa, com a cabeça virada para +X
 export function Cat() {
   const [awake, setAwake] = useState(false) // estado local: só o gato precisa saber
   const body = useRef<THREE.Group>(null!)
-  const timer = useRef<number | undefined>(undefined) // React 19: useRef exige valor inicial
+  const torso = useRef<THREE.Group>(null!)
+  const head = useRef<THREE.Group>(null!)
+  const tail = useRef<THREE.Group>(null!)
+  const timer = useRef<number | undefined>(undefined)
+
+  // rabo: um "tubo" que segue uma curva que contorna o corpo pela frente
+  const tailGeometry = useMemo(() => {
+    const curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.3, 0.12, 0),
+      new THREE.Vector3(-0.36, 0.06, 0.12),
+      new THREE.Vector3(-0.2, 0.04, 0.24),
+      new THREE.Vector3(0.05, 0.04, 0.26),
+      new THREE.Vector3(0.2, 0.05, 0.2),
+    ])
+    return new THREE.TubeGeometry(curve, 24, 0.035, 8, false)
+  }, [])
+  useEffect(() => () => tailGeometry.dispose(), [tailGeometry])
 
   // se o componente sair da tela com o timer rodando, cancela
   useEffect(() => () => clearTimeout(timer.current), [])
 
   useFrame((state, delta) => {
     const t = state.clock.elapsedTime
-    const { damp } = THREE.MathUtils
 
-    // acordado: sobe e flutua; dormindo: desce para a almofada
-    const targetY = awake ? 0.45 + Math.sin(t * 4) * 0.06 : 0
+    // acordado: flutua (é um Gato Flutuante!); dormindo: fica deitado na mesa
+    const targetY = awake ? 0.4 + Math.sin(t * 4) * 0.05 : 0
     body.current.position.y = damp(body.current.position.y, targetY, 6, delta)
 
-    // dormindo: "respira" (estica um pouco na altura); acordado: balança de leve
-    body.current.scale.y = awake ? 1 : 1 + Math.sin(t * 2) * 0.04
-    body.current.rotation.z = awake ? Math.sin(t * 3) * 0.12 : 0
+    // dormindo: o corpo "respira"
+    torso.current.scale.y = awake ? 1 : 1 + Math.sin(t * 2) * 0.035
+
+    // cabeça: dormindo fica baixa e apoiada; acordado levanta e inclina, curiosa
+    head.current.position.y = damp(head.current.position.y, awake ? 0.36 : 0.22, 8, delta)
+    head.current.rotation.z = damp(head.current.rotation.z, awake ? 0.15 : -0.15, 8, delta)
+    head.current.rotation.x = damp(head.current.rotation.x, awake ? Math.sin(t * 3) * 0.15 : 0, 8, delta)
+
+    // rabo: balança rápido acordado, quase parado dormindo
+    tail.current.rotation.y = awake ? Math.sin(t * 8) * 0.25 : Math.sin(t * 0.8) * 0.05
   })
 
   function wakeUp() {
     setAwake(true)
-    playTone([720, 880, 520], 0.45, 'sawtooth') // "miau" eletrônico: sobe e desce
-    clearTimeout(timer.current) // cancela o timer anterior, se houver
+    playTone([720, 880, 520], 0.45, 'sawtooth')
+    clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setAwake(false), AWAKE_MS)
   }
 
   return (
-    <Hotspot id="gatos" label="Gatos Flutuantes" position={[-1.05, 1.55, -4.15]} labelOffset={[0, 1.1, 0]} onActivate={wakeUp}>
-      {/* almofada */}
-      <mesh receiveShadow position={[0, 0.04, 0]}>
-        <cylinderGeometry args={[0.38, 0.4, 0.08, 20]} />
-        <meshStandardMaterial color="#b9a7e8" />
-      </mesh>
-
-      {/* corpo inteiro num grupo, para flutuar e balançar junto */}
+    <Hotspot id="gatos" label="Gatos Flutuantes" position={[-1.35, 1.55, -3.1]} labelOffset={[0, 1.0, 0]} onActivate={wakeUp}>
       <group ref={body}>
-        <Box size={[0.5, 0.24, 0.34]} position={[0, 0.2, 0]} color={FUR} />
-        <Box size={[0.12, 0.25, 0.34]} position={[-0.05, 0.2, 0]} color={DARK} /> {/* listra */}
-
-        {/* cabeça: um pouco mais alta quando acordado (levantou a cabeça) */}
-        <group position={[0.3, awake ? 0.36 : 0.22, 0.02]}>
-          <Box size={[0.26, 0.24, 0.26]} color={FUR} />
-          <Box size={[0.07, 0.09, 0.05]} position={[-0.07, 0.15, -0.06]} color={DARK} /> {/* orelhas */}
-          <Box size={[0.07, 0.09, 0.05]} position={[-0.07, 0.15, 0.08]} color={DARK} />
-          {/* olhos: tracinho fechado dormindo, aberto acordado */}
-          <Box size={[0.02, awake ? 0.05 : 0.015, 0.04]} position={[0.13, 0.03, -0.06]} color="#222" />
-          <Box size={[0.02, awake ? 0.05 : 0.015, 0.04]} position={[0.13, 0.03, 0.06]} color="#222" />
+        {/* corpo: cápsula deitada (girada 90° em Z), um pouco achatada */}
+        <group ref={torso} position={[0, 0.15, 0]}>
+          <mesh castShadow receiveShadow rotation={[0, 0, Math.PI / 2]} scale={[0.9, 1, 1]}>
+            <capsuleGeometry args={[0.15, 0.3, 6, 16]} />
+            <meshStandardMaterial color={FUR} roughness={0.9} />
+          </mesh>
+          {/* listras: arcos de toro passando por cima das costas */}
+          {[-0.14, -0.02, 0.1].map((x) => (
+            <mesh key={x} position={[x, 0, 0]} rotation={[0, Math.PI / 2, 0]} scale={[1, 0.9, 1]}>
+              <torusGeometry args={[0.152, 0.018, 6, 20, Math.PI]} />
+              <meshStandardMaterial color={STRIPE} roughness={0.9} />
+            </mesh>
+          ))}
         </group>
 
-        {/* rabo enrolado para o lado */}
-        <Box size={[0.1, 0.08, 0.36]} position={[-0.28, 0.13, 0.1]} rotation={[0, 0.5, 0]} color={DARK} />
+        {/* patinhas da frente, brancas, saindo de baixo do peito */}
+        {[-0.07, 0.07].map((z) => (
+          <mesh key={z} castShadow position={[0.27, 0.035, z]} scale={[1.5, 0.6, 1]}>
+            <sphereGeometry args={[0.045, 12, 10]} />
+            <meshStandardMaterial color={WHITE} />
+          </mesh>
+        ))}
+
+        {/* rabo (geometria criada acima) */}
+        <group ref={tail}>
+          <mesh castShadow geometry={tailGeometry}>
+            <meshStandardMaterial color={FUR} roughness={0.9} />
+          </mesh>
+        </group>
+
+        {/* cabeça: o grupo é o "pescoço" (pivô) */}
+        <group ref={head} position={[0.3, 0.22, 0]}>
+          <mesh castShadow scale={[0.95, 0.88, 1]}>
+            <sphereGeometry args={[0.14, 20, 16]} />
+            <meshStandardMaterial color={FUR} roughness={0.9} />
+          </mesh>
+
+          {/* orelhas: cones laranja com um cone rosa menor na frente */}
+          {[-1, 1].map((side) => (
+            <group key={side} position={[0, 0.1, side * 0.075]} rotation={[side * 0.35, 0, 0]}>
+              <mesh castShadow position={[0, 0.04, 0]}>
+                <coneGeometry args={[0.055, 0.1, 12]} />
+                <meshStandardMaterial color={FUR} />
+              </mesh>
+              <mesh position={[0.02, 0.035, 0]} scale={[0.5, 0.75, 0.6]}>
+                <coneGeometry args={[0.055, 0.1, 12]} />
+                <meshStandardMaterial color={PINK} />
+              </mesh>
+            </group>
+          ))}
+
+          {/* focinho branco + nariz rosa */}
+          <mesh position={[0.1, -0.04, 0]} scale={[0.7, 0.6, 1.1]}>
+            <sphereGeometry args={[0.07, 14, 10]} />
+            <meshStandardMaterial color={WHITE} />
+          </mesh>
+          <mesh position={[0.145, -0.01, 0]}>
+            <sphereGeometry args={[0.016, 8, 6]} />
+            <meshStandardMaterial color={PINK} />
+          </mesh>
+
+          {/* olhos: fechados = tracinho escuro; abertos = olho verde com pupila de fenda */}
+          {[-1, 1].map((side) => (
+            <group key={side} position={[0.115, 0.03, side * 0.06]}>
+              {awake ? (
+                <>
+                  <mesh scale={[0.5, 1, 1]}>
+                    <sphereGeometry args={[0.028, 12, 10]} />
+                    <meshStandardMaterial color={EYE} roughness={0.3} />
+                  </mesh>
+                  <mesh position={[0.012, 0, 0]}>
+                    <boxGeometry args={[0.006, 0.04, 0.01]} />
+                    <meshBasicMaterial color="#111" />
+                  </mesh>
+                </>
+              ) : (
+                <mesh rotation={[side * 0.25, 0, 0]}>
+                  <boxGeometry args={[0.01, 0.008, 0.045]} />
+                  <meshBasicMaterial color="#3a2414" />
+                </mesh>
+              )}
+            </group>
+          ))}
+
+          {/* bigodes: 2 fios finos de cada lado, abrindo em leque */}
+          {[-1, 1].map((side) =>
+            [-0.12, 0.12].map((tilt) => (
+              <mesh key={`${side}${tilt}`} position={[0.12, -0.04, side * 0.09]} rotation={[tilt, side * 0.25, 0]}>
+                <boxGeometry args={[0.004, 0.004, 0.13]} />
+                <meshBasicMaterial color="#fffaf0" />
+              </mesh>
+            )),
+          )}
+        </group>
       </group>
 
-      {awake && (
-        <Html position={[0.4, 1.0, 0]} center style={{ pointerEvents: 'none' }}>
-          <div style={bubbleStyle}>miau!</div>
-        </Html>
-      )}
+      {awake && <SpeechBubble position={[0.4, 0.95, 0]} text="miau!" />}
     </Hotspot>
   )
-}
-
-const bubbleStyle: React.CSSProperties = {
-  font: '700 13px sans-serif',
-  background: '#fff',
-  color: '#13111c',
-  padding: '4px 10px',
-  borderRadius: '12px 12px 12px 2px', // canto "cortado" = balão de fala
-  whiteSpace: 'nowrap',
 }
