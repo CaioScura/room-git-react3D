@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import styles from './Git.module.css'
 import { Diorama, type ProjectId } from './diorama'
 import { GIT_PROJECTS } from './gitProjects'
-import { FaGithub } from 'react-icons/fa'
+import { FiArrowUpRight, FiImage } from 'react-icons/fi'
 
 import GitStats from './GitStats'
 import { useGitStats } from './useGitStats' 
@@ -95,8 +95,35 @@ const Git = () => {
                                 <button type="button" className={styles.back} onClick={() => setSelected(null)}>
                                     ← voltar ao quarto
                                 </button>
-                                    <h3 className={styles.projectTitle}>{project.title}</h3>
+                                    <p className={styles.category}>{project.category}</p>
+                                    <h3 className={styles.projectTitle}>
+                                        {project.title}
+                                        {project.note && <span className={styles.note}>{project.note}</span>}
+                                    </h3>
                                     <p className={styles.text}>{project.description}</p>
+
+                                    {/* vídeo quando tiver; senão a imagem; senão um espaço reservado */}
+                                    <div className={styles.media}>
+                                        {project.video ? (
+                                            <video
+                                                key={project.video} // troca de projeto = recarrega o vídeo
+                                                src={project.video}
+                                                poster={project.image}
+                                                autoPlay
+                                                loop
+                                                muted
+                                                playsInline
+                                                controls
+                                            />
+                                        ) : project.image ? (
+                                            <img src={project.image} alt={project.title} />
+                                        ) : (
+                                            <div className={styles.mediaPlaceholder}>
+                                                <FiImage />
+                                                <span>Prévia em breve</span>
+                                            </div>
+                                        )}
+                                    </div>
 
                                     <ul className={styles.stack}>
                                         {project.stack.map((tech) => (
@@ -104,9 +131,15 @@ const Git = () => {
                                         ))}
                                     </ul>
 
-                                    {project.repoUrl && (
-                                        <a className={styles.link} href={project.repoUrl} target="_blank" rel="noreferrer">
-                                            <FaGithub /> Ver código
+                                    {/* um botão só: o projeto publicado, ou o repositório se não estiver no ar */}
+                                    {(project.liveUrl ?? project.repoUrl) && (
+                                        <a
+                                            className={styles.liveLink}
+                                            href={project.liveUrl ?? project.repoUrl}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                        >
+                                            Ver projeto <FiArrowUpRight />
                                         </a>
                                     )}
                                 </>
