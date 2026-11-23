@@ -27,8 +27,9 @@ export function Village() {
   })
 
   return (
+    // prateleira na parede da esquerda (onde ficava o neon "</>"), girada para olhar para dentro do quarto
     // escala 0.8: prateleira menor para o quarto compacto
-    <group position={[-1.25, 2.95, -3.27]} scale={0.8}>
+    <group position={[-3.27, 2.7, -1.7]} rotation={[0, Math.PI / 2, 0]} scale={0.8}>
     <Hotspot id="vila" label="Vila Nuvem" labelOffset={[0, 1.45, 0]}>
       <Box size={[1.9, 0.08, 0.5]} color={PALETTE.wood} radius={0.02} />
       <Box size={[0.06, 0.25, 0.3]} position={[-0.75, -0.16, -0.05]} color={PALETTE.woodDark} />

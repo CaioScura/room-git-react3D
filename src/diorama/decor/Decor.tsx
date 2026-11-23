@@ -10,7 +10,6 @@ import { CoffeeTable } from './CoffeeTable'
 import { Guitar } from './Guitar'
 import { ArtCorner } from './ArtCorner'
 import { WallArt } from './WallArt'
-import { NeonSign } from './NeonSign'
 import { PALETTE } from '../utils/palette'
 
 type Vec3 = [number, number, number]
@@ -48,7 +47,6 @@ export function Decor() {
 
       {/* ── parede da esquerda (do fundo para a frente) ── */}
       <HangingPlant position={[-3.05, 2.55, -2.75]} hookHeight={0.9} />
-      <NeonSign position={[-3.46, 2.85, -1.6]} rotation={FACING_FROM_LEFT_WALL} />
       <FloorLamp position={[-3.1, 0, -0.75]} />
       <WallArt />
       <Sofa position={[-3.02, 0, 0.85]} rotation={FACING_FROM_LEFT_WALL} />

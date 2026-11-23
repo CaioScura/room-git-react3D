@@ -54,9 +54,9 @@ function Leg({ position, rotation, height }: { position: [number, number, number
   )
 }
 
-// canto artístico: cavalete com tela + banquinho com paleta + potes de tinta e pincéis
+// canto artístico: cavalete com tela + banquinho com paleta
 export function ArtCorner({ position, rotation }: { position: [number, number, number]; rotation?: [number, number, number] }) {
-  const painting = useMemo(createPaintingTexture, [])
+  const painting = useMemo(() => createPaintingTexture(), [])
   useEffect(() => () => painting.dispose(), [painting])
 
   return (
@@ -107,26 +107,6 @@ export function ArtCorner({ position, rotation }: { position: [number, number, n
             )
           })}
         </group>
-      </group>
-
-      {/* potes de tinta e pincéis no chão */}
-      <group position={[-0.65, 0, 0.6]}>
-        {[PALETTE.accentDeep, PALETTE.pink, PALETTE.ice].map((color, i) => (
-          <mesh key={i} castShadow position={[i * 0.14 - 0.14, 0.07, (i % 2) * 0.1]}>
-            <cylinderGeometry args={[0.06, 0.06, 0.14, 14]} />
-            <meshStandardMaterial color={color} />
-          </mesh>
-        ))}
-        <mesh castShadow position={[0.05, 0.1, -0.15]}>
-          <cylinderGeometry args={[0.07, 0.06, 0.2, 14]} />
-          <meshStandardMaterial color={PALETTE.lavender} />
-        </mesh>
-        {[-0.03, 0, 0.03].map((x, i) => (
-          <mesh key={x} position={[0.05 + x, 0.28, -0.15]} rotation={[0, 0, x * 3]}>
-            <cylinderGeometry args={[0.007, 0.007, 0.28, 6]} />
-            <meshStandardMaterial color={[PALETTE.woodDark, PALETTE.accent, PALETTE.pink][i]} />
-          </mesh>
-        ))}
       </group>
     </group>
   )

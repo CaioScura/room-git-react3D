@@ -14,7 +14,8 @@ const AWAKE_MS = 3000
 
 const { damp } = THREE.MathUtils
 
-// gato laranja deitado em "pãozinho" no canto da mesa, com a cabeça virada para +X
+// gato laranja deitado em "pãozinho" na almofada da frente do sofá
+// (montado com a cabeça para +X; girado −90° em Y para a cabeça apontar para +Z, ao longo do sofá)
 export function Cat() {
   const [awake, setAwake] = useState(false) // estado local: só o gato precisa saber
   const body = useRef<THREE.Group>(null!)
@@ -66,7 +67,14 @@ export function Cat() {
   }
 
   return (
-    <Hotspot id="gatos" label="Gatos Flutuantes" position={[-1.35, 1.55, -3.1]} labelOffset={[0, 1.0, 0]} onActivate={wakeUp}>
+    <Hotspot
+      id="gatos"
+      label="Gatos Flutuantes"
+      position={[-2.95, 0.6, 1.15]}
+      rotation={[0, -Math.PI / 2, 0]}
+      labelOffset={[0, 1.0, 0]}
+      onActivate={wakeUp}
+    >
       <group ref={body}>
         {/* corpo: cápsula deitada (girada 90° em Z), um pouco achatada */}
         <group ref={torso} position={[0, 0.15, 0]}>
